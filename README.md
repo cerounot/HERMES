@@ -25,3 +25,21 @@ Además de brindar la traducción de lenguaje natural a lengua de señas, se pro
 ## Observaciones para el Desarrollador
 ### Modelos de Idiomas para Vosk
 Para obtener Modelos de Idiomas para la Librería, se deberá de ingresar a esta **[URL](https://alphacephei.com/vosk/models)** y descargar el modelo pertinente.
+
+## Configuración del Entorno Virtual
+
+1. Crea un entorno virtual utilizando el siguiente comando:
+    ```
+    py -m venv .venv
+    ```
+
+2. Activa el entorno virtual:
+    ```
+    .venv\Scripts\activate
+    ```
+
+## Instalación de Dependencias
+
+Instala las dependencias del proyecto utilizando pip:
+
+    pip install -r requirements.txt
