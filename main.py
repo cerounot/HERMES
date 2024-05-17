@@ -1,7 +1,7 @@
 import os
 import json
 import pyaudio
-import re
+import unicodedata
 from vosk import Model, KaldiRecognizer
 from io import StringIO
 from PIL import Image
@@ -38,10 +38,8 @@ def translate():
     is_on_queue = False
     print("######### Fin de la Prueba de Queue #########")
 
-def clean_filename(filename):
-    # Remover caracteres especiales y espacios
-    cleaned_filename = re.sub(r'[^\w.-]', '_', filename)
-    return cleaned_filename
+def normalize_str(texto):
+    return ''.join(c for c in unicodedata.normalize('NFKD', texto) if unicodedata.category(c) != 'Mn')
 
 def showImgs():
     global is_on_queue
@@ -49,7 +47,7 @@ def showImgs():
     print("######### Probando Queue #########")
     is_on_queue = True
     for img_name in queue_imgs:
-        img_name_cleaned = clean_filename(img_name)  # Limpiar el nombre del archivo
+        img_name_cleaned = normalize_str(img_name)  # Limpiar el nombre del archivo
         img_path = os.path.join("img", img_name_cleaned + ".png")
         try:
             img = Image.open(img_path)
