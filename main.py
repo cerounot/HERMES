@@ -52,7 +52,7 @@ def cycle_images():
             time.sleep(0.5)  # Espera 0.5 segundos antes de mostrar la siguiente imagen
         except Exception as e:
             print(f"Error al mostrar la imagen {img_name}: {e}")
-    root.after(500, root.destroy)  # Cierra la ventana después de 0.5 segundos de mostrar la última imagen
+    root.after(200, root.destroy)  # Cierra la ventana después de 0.5 segundos de mostrar la última imagen
 
 def open_window():
     global root, image_label
