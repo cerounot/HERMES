@@ -6,10 +6,9 @@ idna==3.7
 pillow==10.3.0
 PyAudio==0.2.14
 pycparser==2.22
-requests==2.31.0
+requests==2.32.2
 srt==3.5.3
 tqdm==4.66.4
 urllib3==2.2.1
 vosk==0.3.45
 websockets==12.0
-pillow==10.3.0
