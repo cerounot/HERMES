@@ -7,11 +7,13 @@ import threading
 import os
 from vosk_recognizer import VoskRecognizer
 from queue_processor import QueueProcessor
+import unicodedata
 
 # Variables globales
 is_muted = False
 audio_data = np.zeros(1024)
 img_dict = {}  # Diccionario para almacenar las imágenes del abecedario
+image_refs = []  # Lista para mantener las referencias a las imágenes
 
 # Inicializar PyAudio
 pAudio = pyaudio.PyAudio()
@@ -22,10 +24,14 @@ def toggle_mute():
     is_muted = not is_muted
     btn_mute.config(text="Desmutear" if is_muted else "Mutear")
 
+def normalize_str(texto):
+    return ''.join(c for c in unicodedata.normalize('NFKD', texto) if unicodedata.category(c) != 'Mn')
+
 # Función para cargar las imágenes del abecedario
 def cargar_imagenes():
     global img_dict
     for letra in 'abcdefghijklmnopqrstuvwxyz':
+        letra = normalize_str(letra)
         img_path = os.path.join('img', f'{letra}.png')
         if os.path.exists(img_path):
             img = Image.open(img_path)
@@ -34,13 +40,17 @@ def cargar_imagenes():
 
 # Función para mostrar las imágenes del abecedario
 def mostrar_imagenes(transcripcion):
-    for widget in frame_abecedario.winfo_children():
-        widget.destroy()
+    global image_refs
+    canvas_abecedario.delete("all")
+    image_refs = []  # Limpiar las referencias a imágenes anteriores
     
+    x_offset = 10
     for letra in transcripcion:
         if letra in img_dict:
-            lbl_img = tk.Label(frame_abecedario, image=img_dict[letra])
-            lbl_img.pack(side=tk.LEFT)
+            img = img_dict[letra]
+            canvas_abecedario.create_image(x_offset, 10, anchor=tk.NW, image=img)
+            image_refs.append(img)  # Mantener la referencia a la imagen
+            x_offset += 60  # Aumenta el desplazamiento para la siguiente imagen
 
 # Función para escuchar y actualizar los datos de audio
 def listen_audio():
@@ -62,11 +72,11 @@ def listen_audio():
                     transcription = recognizer.recognize(data)
                     if transcription:
                         print(transcription)
-                        if not processor.isOnQueue():  #alexis
-                            processor.add_transcription(transcription)
+                        # # if not processor.isOnQueue():
+                        # #     processor.add_transcription(transcription)
                         mostrar_imagenes(transcription.lower())  # Mostrar las imágenes de la transcripción
-                    else:
-                        processor.process_queue()
+                    # else:
+                    #     processor.process_queue()
                 except KeyboardInterrupt:
                     print("Interrupción recibida, deteniendo...")
                     break
@@ -94,7 +104,7 @@ def update_plot():
         x2 = i * width / len(audio_data)
         y2 = center - audio_data[i] * scale
         canvas.create_line(x1, y1, x2, y2, fill="blue")
-    ventana.after(50, update_plot)
+    ventana.after(100, update_plot)  # Aumentar el intervalo a 100ms
 
 # Crear la ventana principal
 ventana = tk.Tk()
@@ -123,9 +133,16 @@ ventana.bind("<Escape>", salir_pantalla_completa)
 canvas = tk.Canvas(ventana, width=150, height=150)
 canvas.pack()
 
-# Crear un frame para mostrar las imágenes del abecedario
+# Crear un frame con un canvas y un scrollbar para mostrar las imágenes del abecedario
 frame_abecedario = tk.Frame(ventana)
-frame_abecedario.pack()
+frame_abecedario.pack(fill=tk.BOTH, expand=True)
+
+canvas_abecedario = tk.Canvas(frame_abecedario)
+scrollbar = tk.Scrollbar(frame_abecedario, orient=tk.HORIZONTAL, command=canvas_abecedario.xview)
+canvas_abecedario.configure(xscrollcommand=scrollbar.set)
+
+scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+canvas_abecedario.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
 # Cargar las imágenes del abecedario
 cargar_imagenes()
