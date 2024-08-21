@@ -22,7 +22,6 @@ rec = KaldiRecognizer(model, 16000)
 # Conexión a MongoDB
 try:
     # Conectar a MongoDB Atlas
-    #uri = "mongodb+srv://CeroUnoClusterAdmin:209197219Jenniffer@cluster0.pk2h25a.mongodb.net/?appName=Cluster"
     uri = "Uri del Servidor"
     # mongo_client = MongoClient(uri, server_api=ServerApi('1'))
     mongo_client = MongoClient(uri, server_api=ServerApi('1'))
